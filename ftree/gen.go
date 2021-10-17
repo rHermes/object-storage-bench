@@ -67,7 +67,7 @@ func genTreeStruct(pool map[string]uint64, c Config, n Node, level uint64) {
 	// we know each node is a file, but we don't know how many of them are
 	// to be redistributed. We loop through and check to see.
 	filesToDist := make([]string, 0)
-	for name, _ := range n.Children {
+	for name := range n.Children {
 		l := pool[name]
 		if l < level {
 			panic("this should never happen!")
@@ -122,7 +122,7 @@ func genTreeStruct(pool map[string]uint64, c Config, n Node, level uint64) {
 // utilitty function to create a float array
 func repeatFloat(f float64, n uint64) []float64 {
 	xs := make([]float64, n)
-	for i, _ := range xs {
+	for i := range xs {
 		xs[i] = f
 	}
 	return xs

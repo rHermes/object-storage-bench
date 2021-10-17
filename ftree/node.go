@@ -64,7 +64,7 @@ func (n Node) printTree(w io.Writer, level int) {
 
 	// sort the keys before printing
 	keys := make([]string, 0, len(n.Children))
-	for key, _ := range n.Children {
+	for key := range n.Children {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
@@ -94,7 +94,7 @@ func (n Node) getFiles(prefix string) []string {
 
 	// sort the keys before printing
 	keys := make([]string, 0, len(n.Children))
-	for key, _ := range n.Children {
+	for key := range n.Children {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
