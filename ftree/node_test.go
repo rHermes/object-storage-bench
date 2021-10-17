@@ -1,25 +1,26 @@
-package ftree
+package ftree_test
 
 import (
 	"strings"
 	"testing"
 
+	"github.com/rhermes/object-storage-bench/ftree"
 	"github.com/stretchr/testify/require"
 )
 
-var nodeTestTree = Node{
-	Children: map[string]Node{
-		"bus": Node{
-			Children: map[string]Node{
-				"two": Node{},
-				"abc": Node{
-					Children: map[string]Node{
-						"peter": Node{},
+var nodeTestTree = ftree.Node{
+	Children: map[string]ftree.Node{
+		"bus": ftree.Node{
+			Children: map[string]ftree.Node{
+				"two": ftree.Node{},
+				"abc": ftree.Node{
+					Children: map[string]ftree.Node{
+						"peter": ftree.Node{},
 					},
 				},
 			},
 		},
-		"apple": Node{},
+		"apple": ftree.Node{},
 	},
 }
 
@@ -30,7 +31,7 @@ func TestFromFiles(t *testing.T) {
 		"bus/abc/peter",
 	}
 
-	n := FromFiles(files)
+	n := ftree.FromFiles(files)
 	require.Equal(t, nodeTestTree, n)
 }
 
