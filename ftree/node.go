@@ -15,6 +15,38 @@ type Node struct {
 	Children map[string]Node
 }
 
+// FromFiles returns a tree built on the files in the files tree.
+func FromFiles(files []string) Node {
+	root := Node{Children: make(map[string]Node)}
+
+	for _, file := range files {
+		// Clean the file to make sure it's nice.
+		file = path.Clean(file)
+		parts := strings.Split(file, "/")
+
+		// Just guard against the file ending with a /
+		if strings.HasSuffix(file, "/") {
+			panic("files should not end in a slash")
+		}
+
+		cNode := root
+		for i, part := range parts {
+			if _, ok := cNode.Children[part]; !ok {
+				// The last part should only be created
+				if i != len(parts)-1 {
+					cNode.Children[part] = Node{Children: make(map[string]Node)}
+				} else {
+					cNode.Children[part] = Node{}
+				}
+			}
+
+			cNode = cNode.Children[part]
+		}
+	}
+
+	return root
+}
+
 func (n Node) IsFile() bool {
 	return len(n.Children) == 0
 }
@@ -103,4 +135,22 @@ func (n Node) avgDepth(level uint64) (uint64, uint64) {
 		cnt += kc
 	}
 	return sum, cnt
+}
+
+// MaxDepth returns the MaxDepth for node.
+func (n Node) MaxDepth() uint64 {
+	if n.IsFile() {
+		return 0
+	}
+
+	ret := uint64(0)
+	for _, nd := range n.Children {
+		nm := nd.MaxDepth()
+		if nm > ret {
+			ret = nm
+		}
+	}
+
+	// We add one for the current node
+	return ret + 1
 }

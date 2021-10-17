@@ -23,6 +23,17 @@ var nodeTestTree = Node{
 	},
 }
 
+func TestFromFiles(t *testing.T) {
+	files := []string{
+		"apple",
+		"bus/two",
+		"bus/abc/peter",
+	}
+
+	n := FromFiles(files)
+	require.Equal(t, nodeTestTree, n)
+}
+
 func TestNodePrint(t *testing.T) {
 	t.Parallel()
 
@@ -57,4 +68,9 @@ func TestNodeAvgDepth(t *testing.T) {
 
 	x := nodeTestTree.AvgDepth()
 	require.Equal(t, (1.0+3.0+2.0)/3.0, x)
+}
+
+func TestNodeMaxDepth(t *testing.T) {
+	t.Parallel()
+	require.Equal(t, uint64(3), nodeTestTree.MaxDepth())
 }
