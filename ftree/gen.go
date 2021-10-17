@@ -9,13 +9,13 @@ import (
 )
 
 type Config struct {
-	// The seed to the random generator.
-	Seed uint64
+	// The random source fo the generation
+	Src rand.Source
 
 	// Number of files to generate
 	NumFiles uint64
 
-	// The average depth of the folders
+	// The average depth of the folders.
 	AvgDepth uint32
 
 	// Chance of new folders, must be between 0 and 1
@@ -26,12 +26,14 @@ type Config struct {
 func Generate(c Config) Node {
 	//This algorithm was thought up by a young genius I know, I can claim only
 	// the implementation :)
-	src := rand.NewSource(c.Seed)
+	if c.AvgDepth == 0 {
+		panic("avg depth of zero is not possible")
+	}
 
 	// Will be used the generation of file depths
 	pos := distuv.Poisson{
-		Lambda: float64(c.AvgDepth),
-		Src:    src,
+		Lambda: float64(c.AvgDepth - 1),
+		Src:    c.Src,
 	}
 
 	// We start from zero, so it's one less
@@ -51,19 +53,15 @@ func Generate(c Config) Node {
 
 		pool[fname] = depth
 		rootNode.Children[fname] = Node{}
-
-		fmt.Printf("name: %s, depth: %d\n", fname, depth)
 	}
 
-	fmt.Printf("=== Going to generating the tree ===\n\n")
-
 	// Now we must process the tree
-	genTreeStruct(pool, src, c.NewRatio, rootNode, 0)
+	genTreeStruct(pool, c, rootNode, 0)
 
 	return rootNode
 }
 
-func genTreeStruct(pool map[string]uint64, src rand.Source, p float64, n Node, level uint64) {
+func genTreeStruct(pool map[string]uint64, c Config, n Node, level uint64) {
 	// This function is called on each folder.
 
 	// we know each node is a file, but we don't know how many of them are
@@ -80,7 +78,7 @@ func genTreeStruct(pool map[string]uint64, src rand.Source, p float64, n Node, l
 
 		filesToDist = append(filesToDist, name)
 	}
-	fmt.Printf("We are redistributing %d of the %d files.\n", len(filesToDist), len(n.Children))
+	// fmt.Printf("We are redistributing %d of the %d files.\n", len(filesToDist), len(n.Children))
 
 	if len(filesToDist) == 0 {
 		return
@@ -90,8 +88,8 @@ func genTreeStruct(pool map[string]uint64, src rand.Source, p float64, n Node, l
 	sort.Strings(filesToDist)
 
 	// we are using -1 in the N and +1 on the outside, so we always generate at least one folder.
-	numNewFolders := uint64(distuv.Binomial{N: float64(len(filesToDist) - 1), P: p, Src: src}.Rand()) + 1
-	// fmt.Printf("Number of new folders: %d\n", numNewFolders)
+	numNewFolders := uint64(distuv.Binomial{N: float64(len(filesToDist) - 1),
+		P: c.NewRatio, Src: c.Src}.Rand()) + 1
 
 	// We start from zero, so it's one less
 	padding := numDigits(numNewFolders - 1)
@@ -99,7 +97,7 @@ func genTreeStruct(pool map[string]uint64, src rand.Source, p float64, n Node, l
 	newFolders := []string{}
 
 	// now we must distribute the files over. We create an identical one for each possibility.
-	cat := distuv.NewCategorical(repeatFloat(1.0, numNewFolders), src)
+	cat := distuv.NewCategorical(repeatFloat(1.0, numNewFolders), c.Src)
 	for _, name := range filesToDist {
 		folderName := fmt.Sprintf("d%0*.0f", padding, cat.Rand())
 		nb, ok := n.Children[folderName]
@@ -109,14 +107,14 @@ func genTreeStruct(pool map[string]uint64, src rand.Source, p float64, n Node, l
 			newFolders = append(newFolders, folderName)
 		}
 
+		// we move the child down and remove it from the current directory.
 		nb.Children[name] = n.Children[name]
 		delete(n.Children, name)
-		// fmt.Printf("for file %s we are putting it into the new folder %s\n", name, folderName)
 	}
 
 	// Now we simply need to run over the directories we created
 	for _, newFolder := range newFolders {
-		genTreeStruct(pool, src, p, n.Children[newFolder], level+1)
+		genTreeStruct(pool, c, n.Children[newFolder], level+1)
 	}
 
 }

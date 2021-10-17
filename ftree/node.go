@@ -81,3 +81,26 @@ func (n Node) getFiles(prefix string) []string {
 
 	return files
 }
+
+// Avg depth returns the average depth of the files, as measured
+// from this node.
+func (n Node) AvgDepth() float64 {
+	sum, count := n.avgDepth(0)
+	return float64(sum) / float64(count)
+}
+
+// returns the number of files under this this node. I returns
+// the sum and the count of files under it.
+func (n Node) avgDepth(level uint64) (uint64, uint64) {
+	if n.IsFile() {
+		return level, 1
+	}
+
+	sum, cnt := uint64(0), uint64(0)
+	for _, node := range n.Children {
+		ks, kc := node.avgDepth(level + 1)
+		sum += ks
+		cnt += kc
+	}
+	return sum, cnt
+}

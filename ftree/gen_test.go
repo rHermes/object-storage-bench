@@ -1,34 +1,26 @@
 package ftree
 
 import (
-	"fmt"
-	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/rand"
 )
 
+// This is just a dumb test of the generator for now, until I can figure out a
+// way to test it with purpose.
 func TestGenDumb(t *testing.T) {
+	// TODO(rHermes): Make these test actually useful
 	c := Config{
-		Seed:     13,
-		NumFiles: 1000,
+		Src:      rand.NewSource(uint64(time.Now().UnixNano())),
+		NumFiles: 10000,
 		AvgDepth: 3,
-		NewRatio: 0.1,
+		NewRatio: 0.01,
 	}
 
-	fmt.Println("=== ENTERING GENEREATE ===")
 	node := Generate(c)
-	fmt.Println("=== EXITING GENERATE ===")
 
-	node.Print(os.Stdout)
-	// for _, file := range node.Files() {
-	// 	fmt.Println(file)
-	// }
-
-	g := make(map[int][]string)
-
-	g[2] = append(g[2], "wow")
-	g[2] = append(g[2], "wew")
-
-	require.Equal(t, []string{"wow", "wew"}, g[2])
+	require.Len(t, node.Files(), int(c.NumFiles))
+	require.InDelta(t, 3, node.AvgDepth(), 0.1)
 }

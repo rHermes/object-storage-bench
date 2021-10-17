@@ -51,3 +51,10 @@ func TestNodeFiles(t *testing.T) {
 
 	require.Equal(t, expt, nodeTestTree.Files())
 }
+
+func TestNodeAvgDepth(t *testing.T) {
+	t.Parallel()
+
+	x := nodeTestTree.AvgDepth()
+	require.Equal(t, (1.0+3.0+2.0)/3.0, x)
+}
