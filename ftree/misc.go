@@ -2,11 +2,11 @@ package ftree
 
 // numDigits returns the number of digits in the integer if it was
 // formatted as a string.
-func numDigits(i uint64) int {
-	n := 1
+func numDigits(i uint64) (n int) {
 	for i > 9 {
-		n++
 		i /= 10
+		n++
 	}
-	return n
+
+	return n + 1
 }

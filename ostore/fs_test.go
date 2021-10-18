@@ -11,6 +11,8 @@ import (
 )
 
 func TestFsStore(t *testing.T) {
+	t.Parallel()
+
 	// We create a mem fs for testing.
 	fs := afero.NewMemMapFs()
 

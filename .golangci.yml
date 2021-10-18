@@ -1,0 +1,13 @@
+linters:
+  enable-all: true
+  disable:
+    - exhaustivestruct
+    - godox
+    - golint
+    - scopelint
+    - interfacer
+    - maligned
+
+linters-settings:
+  gci:
+    local-prefixes: "github.com/rhermes/object-storage-bench"

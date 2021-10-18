@@ -8,6 +8,8 @@ import (
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
+// A Config describes the parameters used to generate a filetree with the
+// Generate call.
 type Config struct {
 	// The random source fo the generation
 	Src rand.Source
@@ -24,7 +26,7 @@ type Config struct {
 
 // Generate a tree relationship.
 func Generate(c Config) Node {
-	//This algorithm was thought up by a young genius I know, I can claim only
+	// This algorithm was thought up by a young genius I know, I can claim only
 	// the implementation :)
 	if c.AvgDepth == 0 {
 		panic("avg depth of zero is not possible")
@@ -46,6 +48,7 @@ func Generate(c Config) Node {
 	// Pool is the pool of files still left to be placed. They are grouped by
 	// the level they are going to use.
 	pool := make(map[string]uint64, c.NumFiles)
+
 	for i := uint64(0); i < c.NumFiles; i++ {
 		// Filenames are simply numbers with zero names to be all of the same length
 		fname := fmt.Sprintf("f%0*d", padding, i)
@@ -62,17 +65,15 @@ func Generate(c Config) Node {
 }
 
 func genTreeStruct(pool map[string]uint64, c Config, n Node, level uint64) {
-	// This function is called on each folder.
-
 	// we know each node is a file, but we don't know how many of them are
 	// to be redistributed. We loop through and check to see.
 	filesToDist := make([]string, 0)
+
 	for name := range n.Children {
 		l := pool[name]
 		if l < level {
 			panic("this should never happen!")
-		}
-		if l == level {
+		} else if l == level {
 			continue
 		}
 
@@ -88,8 +89,10 @@ func genTreeStruct(pool map[string]uint64, c Config, n Node, level uint64) {
 	sort.Strings(filesToDist)
 
 	// we are using -1 in the N and +1 on the outside, so we always generate at least one folder.
-	numNewFolders := uint64(distuv.Binomial{N: float64(len(filesToDist) - 1),
-		P: c.NewRatio, Src: c.Src}.Rand()) + 1
+	numNewFolders := uint64(distuv.Binomial{
+		N: float64(len(filesToDist) - 1),
+		P: c.NewRatio, Src: c.Src,
+	}.Rand()) + 1
 
 	// We start from zero, so it's one less
 	padding := numDigits(numNewFolders - 1)
@@ -100,10 +103,12 @@ func genTreeStruct(pool map[string]uint64, c Config, n Node, level uint64) {
 	cat := distuv.NewCategorical(repeatFloat(1.0, numNewFolders), c.Src)
 	for _, name := range filesToDist {
 		folderName := fmt.Sprintf("d%0*.0f", padding, cat.Rand())
+
 		nb, ok := n.Children[folderName]
 		if !ok {
 			nb.Children = make(map[string]Node)
 			n.Children[folderName] = nb
+
 			newFolders = append(newFolders, folderName)
 		}
 
@@ -116,14 +121,14 @@ func genTreeStruct(pool map[string]uint64, c Config, n Node, level uint64) {
 	for _, newFolder := range newFolders {
 		genTreeStruct(pool, c, n.Children[newFolder], level+1)
 	}
-
 }
 
-// utilitty function to create a float array
+// utilitty function to create a float array.
 func repeatFloat(f float64, n uint64) []float64 {
 	xs := make([]float64, n)
 	for i := range xs {
 		xs[i] = f
 	}
+
 	return xs
 }

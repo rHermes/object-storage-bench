@@ -47,6 +47,7 @@ func FromFiles(files []string) Node {
 	return root
 }
 
+// IsFile returns if the node is a file.
 func (n Node) IsFile() bool {
 	return len(n.Children) == 0
 }
@@ -67,11 +68,14 @@ func (n Node) printTree(w io.Writer, level int) {
 	for key := range n.Children {
 		keys = append(keys, key)
 	}
-	sort.Strings(keys)
 
 	indent := strings.Repeat(" ", level)
+
+	sort.Strings(keys)
+
 	for _, key := range keys {
 		nd := n.Children[key]
+
 		if nd.IsFile() {
 			fmt.Fprintf(w, "%s%s\n", indent, key)
 		} else {
@@ -97,9 +101,11 @@ func (n Node) getFiles(prefix string) []string {
 	for key := range n.Children {
 		keys = append(keys, key)
 	}
+
 	sort.Strings(keys)
 
 	files := make([]string, 0)
+
 	for _, key := range keys {
 		nd := n.Children[key]
 		nprefix := path.Join(prefix, key)
@@ -114,10 +120,12 @@ func (n Node) getFiles(prefix string) []string {
 	return files
 }
 
-// Avg depth returns the average depth of the files, as measured
-// from this node.
+// AvgDepth returns the average depth of the files, as measured from this node.
+// It is important to notice that files in the top level directory have a depth
+// of 1.
 func (n Node) AvgDepth() float64 {
 	sum, count := n.avgDepth(0)
+
 	return float64(sum) / float64(count)
 }
 
@@ -129,11 +137,13 @@ func (n Node) avgDepth(level uint64) (uint64, uint64) {
 	}
 
 	sum, cnt := uint64(0), uint64(0)
+
 	for _, node := range n.Children {
 		ks, kc := node.avgDepth(level + 1)
 		sum += ks
 		cnt += kc
 	}
+
 	return sum, cnt
 }
 
@@ -144,6 +154,7 @@ func (n Node) MaxDepth() uint64 {
 	}
 
 	ret := uint64(0)
+
 	for _, nd := range n.Children {
 		nm := nd.MaxDepth()
 		if nm > ret {

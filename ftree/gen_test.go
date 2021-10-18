@@ -4,14 +4,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rhermes/object-storage-bench/ftree"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
+
+	"github.com/rhermes/object-storage-bench/ftree"
 )
 
 // This is just a dumb test of the generator for now, until I can figure out a
 // way to test it with purpose.
 func TestGenDumb(t *testing.T) {
+	t.Parallel()
+
 	// TODO(rHermes): Make these test actually useful
 	c := ftree.Config{
 		Src:      rand.NewSource(uint64(time.Now().UnixNano())),

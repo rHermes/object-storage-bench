@@ -4,27 +4,30 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rhermes/object-storage-bench/ftree"
 	"github.com/stretchr/testify/require"
+
+	"github.com/rhermes/object-storage-bench/ftree"
 )
 
 var nodeTestTree = ftree.Node{
 	Children: map[string]ftree.Node{
-		"bus": ftree.Node{
+		"bus": {
 			Children: map[string]ftree.Node{
-				"two": ftree.Node{},
-				"abc": ftree.Node{
+				"two": {},
+				"abc": {
 					Children: map[string]ftree.Node{
-						"peter": ftree.Node{},
+						"peter": {},
 					},
 				},
 			},
 		},
-		"apple": ftree.Node{},
+		"apple": {},
 	},
 }
 
 func TestFromFiles(t *testing.T) {
+	t.Parallel()
+
 	files := []string{
 		"apple",
 		"bus/two",
