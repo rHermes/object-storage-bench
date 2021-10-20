@@ -4,10 +4,11 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu2004
-global_job_config:
-  env_vars:
-    - name: PATH
-      value: /home/semaphore/go/bin:$PATH
+
+# global_job_config:
+#   env_vars:
+#     - name: PATH
+#       value: /home/semaphore/go/bin:$PATH
 
 blocks:
   - name: Download deps
@@ -24,7 +25,7 @@ blocks:
             - go install gotest.tools/gotestsum@v1.7.0
             - go get ./...
 
-  - name: Test
+  - name: Test things
     task:
       jobs:
         - name: go test
