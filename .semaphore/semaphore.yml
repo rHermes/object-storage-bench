@@ -4,7 +4,24 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu2004
+global_job_config:
+  env_vars:
+    - name: PATH
+      value: /home/semaphore/go/bin:$PATH
+
 blocks:
+  - name: Download deps
+    task:
+      prologue:
+        commands:
+          - checkout --use-cache
+          - cache restore
+          - sem-version go 1.16.3
+          - go install gotest.tools/gotestsum@v1.7.0
+          - go get ./...
+      jobs:
+        - name: download deps
+
   - name: Test
     task:
       jobs:
@@ -16,9 +33,6 @@ blocks:
           - checkout --use-cache
           - cache restore
           - sem-version go 1.16.3
-          - export PATH=/home/semaphore/go/bin:$PATH
-          - go install gotest.tools/gotestsum@v1.7.0
-          - go get ./...
       epilogue:
         always:
           commands:
