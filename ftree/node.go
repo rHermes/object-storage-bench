@@ -96,12 +96,12 @@ func (n Node) getFiles(prefix string) []string {
 		return nil
 	}
 
-	// sort the keys before printing
 	keys := make([]string, 0, len(n.Children))
 	for key := range n.Children {
 		keys = append(keys, key)
 	}
 
+	// We sort the keys, to ensure stable output.
 	sort.Strings(keys)
 
 	files := make([]string, 0)
