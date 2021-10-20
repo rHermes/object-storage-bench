@@ -16,7 +16,6 @@ blocks:
       jobs:
         - name: download deps
           commands:
-            - go install gotest.tools/gotestsum@v1.7.0
             - go get ./...
 
   - name: Test things
@@ -31,6 +30,7 @@ blocks:
       jobs:
         - name: go test
           commands:
+            - go install gotest.tools/gotestsum@v1.7.0
             - gotestsum --junitfile /tmp/junit.xml ./...
 
       epilogue:
