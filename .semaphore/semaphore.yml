@@ -4,38 +4,22 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu2004
-
 blocks:
-  - name: Download deps
+  - name: Run tests
     task:
       prologue:
         commands:
+          - sem-version go 1.16.3
           - checkout --use-cache
           - cache restore
-          - sem-version go 1.16.3
-      jobs:
-        - name: download deps
-          commands:
-            - go get ./...
-
-  - name: Test things
-    task:
-      prologue:
-        commands:
           - export PATH=/home/semaphore/go/bin:$PATH
-          - checkout --use-cache
-          - cache restore
-          - sem-version go 1.16.3
-          - go install gotest.tools/gotestsum@v1.7.0
-
       jobs:
         - name: go test
           commands:
+            - go install gotest.tools/gotestsum@v1.7.0
             - gotestsum --junitfile /tmp/junit.xml ./...
-
       epilogue:
         always:
           commands:
             - cache store
             - test-results publish /tmp/junit.xml
-
