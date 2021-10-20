@@ -5,17 +5,11 @@ agent:
     type: e1-standard-2
     os_image: ubuntu2004
 
-# global_job_config:
-#   env_vars:
-#     - name: PATH
-#       value: /home/semaphore/go/bin:$PATH
-
 blocks:
   - name: Download deps
     task:
       prologue:
         commands:
-          - echo "$PATH"
           - checkout --use-cache
           - cache restore
           - sem-version go 1.16.3
@@ -27,15 +21,18 @@ blocks:
 
   - name: Test things
     task:
+      prologue:
+        commands:
+          - export PATH=/home/semaphore/go/bin:$PATH
+          - checkout --use-cache
+          - cache restore
+          - sem-version go 1.16.3
+
       jobs:
         - name: go test
           commands:
             - gotestsum --junitfile /tmp/junit.xml ./...
-      prologue:
-        commands:
-          - checkout --use-cache
-          - cache restore
-          - sem-version go 1.16.3
+
       epilogue:
         always:
           commands:
