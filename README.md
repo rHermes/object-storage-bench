@@ -1,5 +1,7 @@
 # Object storage benchmark
 
+[![Build Status](https://rhermes.semaphoreci.com/badges/object-storage-bench/branches/main.svg?style=shields)](https://rhermes.semaphoreci.com/projects/object-storage-bench)
+
 This repo serves as a set of tools to answer some questions about the
 object storages.
 
