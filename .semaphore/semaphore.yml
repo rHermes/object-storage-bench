@@ -17,10 +17,11 @@ blocks:
           - checkout --use-cache
           - cache restore
           - sem-version go 1.16.3
-          - go install gotest.tools/gotestsum@v1.7.0
-          - go get ./...
       jobs:
         - name: download deps
+          commands:
+            - go install gotest.tools/gotestsum@v1.7.0
+            - go get ./...
 
   - name: Test
     task:
