@@ -4,15 +4,32 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu2004
+global_job_config:
+  prologue:
+    commands:
+      - sem-version go 1.16.3
+      - checkout
+      - export PATH=/home/semaphore/go/bin:$PATH
 blocks:
+  - name: Run linter
+    dependencies: []
+    task:
+      jobs:
+        - name: Run linter
+          commands:
+            - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.42.1
+            - golangci-lint run --out-format junit-xml > /tmp/linter.junit.xml
+      epilogue:
+        always:
+          commands:
+            - test-results publish /tmp/linter.junit.xml
+
   - name: Run tests
+    dependencies: []
     task:
       prologue:
         commands:
-          - sem-version go 1.16.3
-          - checkout --use-cache
           - cache restore
-          - export PATH=/home/semaphore/go/bin:$PATH
       jobs:
         - name: go test
           commands:
@@ -23,3 +40,12 @@ blocks:
           commands:
             - cache store
             - test-results publish /tmp/junit.xml
+
+after_pipeline:
+  task:
+    jobs:
+      - name: Publish Results
+        commands:
+          - test-results gen-pipeline-report
+
+

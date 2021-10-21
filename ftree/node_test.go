@@ -9,6 +9,7 @@ import (
 	"github.com/rhermes/object-storage-bench/ftree"
 )
 
+//nolint:gochecknoglobals
 var nodeTestTree = ftree.Node{
 	Children: map[string]ftree.Node{
 		"bus": {
@@ -42,6 +43,7 @@ func TestNodePrint(t *testing.T) {
 	t.Parallel()
 
 	var buf strings.Builder
+
 	nodeTestTree.Print(&buf)
 
 	expt := strings.TrimSpace(`

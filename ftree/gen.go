@@ -40,10 +40,7 @@ func Generate(c Config) Node {
 
 	// We start from zero, so it's one less
 	padding := numDigits(c.NumFiles - 1)
-
-	rootNode := Node{
-		Children: make(map[string]Node),
-	}
+	rootNode := Node{Children: make(map[string]Node)}
 
 	// Pool is the pool of files still left to be placed. They are grouped by
 	// the level they are going to use.
